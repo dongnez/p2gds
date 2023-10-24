@@ -42,6 +42,14 @@ jobs:
       - name: Build del Back
         working-directory: src/Backend/OrderService
         run: ./gradlew build test
+      
+      - name: dockerizar el front y el backend
+
+      run: |
+          cp src/Clients/build/libs/*.war deploy/docker/Clients/drop 
+          docker build -t p2gps/web deploy/docker/Clients
+          cp src/Backend/OrderService/build/libs/ordering* deploy/docker/Order/drop 
+          docker build -t p2gps/order deploy/docker/Order
 
       # ... (código anterior)
   ### SUBIR IMAGENES A DOCKERHUB #####
