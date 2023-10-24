@@ -43,3 +43,26 @@ jobs:
         working-directory: src/Backend/OrderService
         run: ./gradlew build test
 
+      # ... (código anterior)
+
+      - name: Dockerizar el front y el backend
+        run: |
+          cp src/Clients/build/libs/*.war deploy/docker/Clients/drop # Copiar el resultado del build para la nueva imagen
+          docker build -t p2gps/web deploy/docker/Clients
+          cp src/Backend/OrderService/build/libs/ordering* deploy/docker/Order/drop # Copiar el resultado del build para la nueva imagen
+          docker build -t p2gps/order deploy/docker/Order
+      
+      - name: Subir imágenes a DockerHub
+        run: |
+          # Iniciar sesión en DockerHub
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+      
+          # Etiquetar las imágenes con el formato adecuado para DockerHub
+          docker tag p2gps/web ${{ secrets.DOCKERHUB_USERNAME }}/p2gps:web
+          docker tag p2gps/order ${{ secrets.DOCKERHUB_USERNAME }}/p2gps:order
+      
+          # Subir las imágenes a DockerHub
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/p2gps:order
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/p2gps:web
+
+
